@@ -47,3 +47,10 @@ CREATE TABLE IF NOT EXISTS enrollment (
 -- (Gợi ý) tránh 1 học viên đăng ký trùng 1 khóa nhiều lần
 CREATE UNIQUE INDEX IF NOT EXISTS uq_enrollment_student_course
     ON enrollment(student_id, course_id);
+INSERT INTO projectioc.admin(username, password) VALUES ('admin','123456');
+SELECT * FROM projectioc.student;
+INSERT INTO projectioc.student(name, dob, email, sex, phone, password)
+VALUES ('Trần Lâm', '2007-11-05', 'lamkagm@gmail.com', true, '0359216000', '123456');
+INSERT INTO projectioc.course(name, duration, instructor)
+VALUES ('Java Core', 40, 'Mr. Java'),
+       ('PostgreSQL', 24, 'Ms. SQL');
