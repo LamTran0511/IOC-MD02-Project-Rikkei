@@ -1,11 +1,13 @@
 package IOC_MD02_Project;
 
+import java.sql.Date;
 import java.sql.SQLException;
 
 public class Main {
 
     static final AdminDao adminDao = new AdminDao();
     static final CourseDao courseDao = new CourseDao();
+    static final StudentDao studentDao = new StudentDao();
 
     public static void main(String[] args) {
         while (true) {
@@ -20,7 +22,7 @@ public class Main {
         }
     }
 
-    // ===== BUỔI 1: Admin Login =====
+
     static void adminLogin() {
         while (true) {
             Input.clear();
@@ -53,10 +55,12 @@ public class Main {
             System.out.println("========== MENU ADMIN ==========");
             System.out.println("Xin chào, " + a.username);
             System.out.println("1. Quản lý khóa học");
-            System.out.println("2. Đăng xuất");
+            System.out.println("2. Quản lý học viên");
+            System.out.println("3. Đăng xuất");
             System.out.println("================================");
-            int ch = Input.readInt("Chọn: ", 1, 2);
+            int ch = Input.readInt("Chọn: ", 1, 3);
             if (ch == 1) adminCourses();
+            else if (ch == 2) adminStudents();
             else return;
         }
     }
@@ -130,6 +134,94 @@ public class Main {
                 }
             } catch (SQLException e) {
                 System.out.println("❌ Lỗi: " + e.getMessage());
+                Input.pause();
+            }
+        }
+    }
+    static void adminStudents() {
+        while (true) {
+            Input.clear();
+            System.out.println("===== QUẢN LÝ HỌC VIÊN (ADMIN) =====");
+            System.out.println("1. Hiển thị danh sách học viên");
+            System.out.println("2. Thêm mới học viên");
+            System.out.println("3. Chỉnh sửa học viên (chọn thuộc tính)");
+            System.out.println("4. Xóa học viên theo id (xác nhận)");
+            System.out.println("5. Tìm kiếm theo tên/email/id (tương đối)");
+            System.out.println("6. Sắp xếp theo tên/id (tăng/giảm)");
+            System.out.println("7. Quay về menu admin");
+            System.out.println("===================================");
+            int ch = Input.readInt("Chọn: ", 1, 7);
+
+            try {
+                switch (ch) {
+                    case 1 -> {
+                        TablePrinter.students(studentDao.list(null, "id", "ASC"));
+                        Input.pause();
+                    }
+                    case 2 -> {
+                        String name = Input.nonBlank("Họ tên: ");
+                        String dobStr = Input.nonBlank("DOB (yyyy-mm-dd): ");
+                        Date dob = Date.valueOf(dobStr); // sai format sẽ throw -> catch bên dưới
+                        String email = Input.nonBlank("Email: ");
+                        int sex = Input.readInt("Giới tính (Nam=1, Nữ=0): ", 0, 1);
+                        String phone = Input.optional("SĐT (có thể bỏ trống): ");
+                        String pass = Input.nonBlank("Password: ");
+
+                        studentDao.add(name, dob, email, sex == 1, phone, pass);
+                        System.out.println("✅ Thêm học viên thành công!");
+                        Input.pause();
+                    }
+                    case 3 -> {
+                        int id = Input.readInt("Nhập id học viên cần sửa: ", 1, Integer.MAX_VALUE);
+                        if (!studentDao.exists(id)) {
+                            System.out.println("❌ Không tìm thấy học viên!");
+                            Input.pause();
+                            break;
+                        }
+
+                        System.out.println("Chọn thuộc tính: 1.name  2.dob  3.email  4.sex  5.phone");
+                        int f = Input.readInt("Chọn: ", 1, 5);
+
+                        switch (f) {
+                            case 1 -> studentDao.updateField(id, "name", Input.nonBlank("Name mới: "));
+                            case 2 -> studentDao.updateField(id, "dob", Date.valueOf(Input.nonBlank("DOB mới (yyyy-mm-dd): ")));
+                            case 3 -> studentDao.updateField(id, "email", Input.nonBlank("Email mới: "));
+                            case 4 -> studentDao.updateField(id, "sex", Input.readInt("Sex (Nam=1, Nữ=0): ", 0, 1) == 1);
+                            case 5 -> studentDao.updateField(id, "phone", Input.optional("Phone mới (có thể bỏ trống): "));
+                        }
+
+                        System.out.println("✅ Cập nhật thành công!");
+                        Input.pause();
+                    }
+                    case 4 -> {
+                        int id = Input.readInt("Nhập id cần xóa: ", 1, Integer.MAX_VALUE);
+                        boolean ok = Input.yesNo("Xác nhận xóa? (y/n): ");
+                        if (ok) {
+                            studentDao.delete(id);
+                            System.out.println("✅ Đã xóa!");
+                        } else {
+                            System.out.println("Đã hủy.");
+                        }
+                        Input.pause();
+                    }
+                    case 5 -> {
+                        String kw = Input.nonBlank("Nhập từ khóa: ");
+                        TablePrinter.students(studentDao.list(kw, "id", "ASC"));
+                        Input.pause();
+                    }
+                    case 6 -> {
+                        String by = Input.choice("Sắp xếp theo (id/name): ", new String[]{"id", "name"});
+                        String dir = Input.choice("Chiều (ASC/DESC): ", new String[]{"ASC", "DESC"});
+                        TablePrinter.students(studentDao.list(null, by, dir));
+                        Input.pause();
+                    }
+                    case 7 -> { return; }
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("❌ DOB sai định dạng! Nhập đúng yyyy-mm-dd.");
+                Input.pause();
+            } catch (SQLException e) {
+                System.out.println("❌ Lỗi DB: " + e.getMessage());
                 Input.pause();
             }
         }
