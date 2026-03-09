@@ -20,6 +20,7 @@ public class TablePrinter {
         System.out.println("+------+------------------------------+----------+----------------------+-------------------------+");
         System.out.println("Tổng: " + list.size());
     }
+
     public static void students(java.util.List<IOC_MD02_Project.Student> list) {
         System.out.println("\n+------+------------------------------+------------+--------------------------+-----+--------------+-------------------------+");
         System.out.printf("| %-4s | %-28s | %-10s | %-24s | %-3s | %-12s | %-23s |\n",
@@ -38,6 +39,20 @@ public class TablePrinter {
         }
 
         System.out.println("+------+------------------------------+------------+--------------------------+-----+--------------+-------------------------+");
+        System.out.println("Tổng: " + list.size());
+    }
+
+    public static void studentRegistered(java.util.List<IOC_MD02_Project.StudentCourseRow> list) {
+        System.out.println("\n+---------+---------+------------------------------+----------+----------------------+-------------------------+-----------+");
+        System.out.printf("| %-7s | %-7s | %-28s | %-8s | %-20s | %-23s | %-9s |\n",
+                "Enroll", "CID", "Khóa học", "Giờ", "Giảng viên", "Ngày đăng ký", "Status");
+        System.out.println("+---------+---------+------------------------------+----------+----------------------+-------------------------+-----------+");
+        for (IOC_MD02_Project.StudentCourseRow r : list) {
+            System.out.printf("| %-7d | %-7d | %-28s | %-8d | %-20s | %-23s | %-9s |\n",
+                    r.enrollId, r.courseId, cut(r.courseName, 28), r.duration,
+                    cut(r.instructor, 20), String.valueOf(r.registeredAt), r.status);
+        }
+        System.out.println("+---------+---------+------------------------------+----------+----------------------+-------------------------+-----------+");
         System.out.println("Tổng: " + list.size());
     }
 }

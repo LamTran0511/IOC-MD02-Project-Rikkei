@@ -8,8 +8,8 @@ public class Student {
     public String name;
     public Date dob;
     public String email;
-    public boolean sex;        // true=Nam, false=Nữ
-    public String phone;       // nullable
-    public String password;    // plain text (theo bài JDBC cơ bản)
+    public boolean sex;
+    public String phone;
+    public String password;
     public Timestamp createAt;
 }

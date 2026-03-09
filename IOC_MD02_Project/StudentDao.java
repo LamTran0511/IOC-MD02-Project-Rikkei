@@ -87,7 +87,6 @@ public class StudentDao {
     }
 
     public void updateField(int id, String field, Object value) throws SQLException {
-        // Whitelist field để tránh injection
         if (!("name".equals(field) || "dob".equals(field) || "email".equals(field) ||
                 "sex".equals(field) || "phone".equals(field))) {
             throw new SQLException("Thuộc tính sửa không hợp lệ!");
@@ -109,6 +108,64 @@ public class StudentDao {
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
+        }
+    }
+
+    public Student login(String key, String password) throws SQLException {
+        String sql =
+                "SELECT id, name, dob, email, sex, phone, password, create_at " +
+                        "FROM student WHERE (email=? OR phone=?) AND password=?";
+        try (Connection c = Db.getConn();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, key);
+            ps.setString(2, key);
+            ps.setString(3, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                Student s = new Student();
+                s.id = rs.getInt("id");
+                s.name = rs.getString("name");
+                s.dob = rs.getDate("dob");
+                s.email = rs.getString("email");
+                s.sex = rs.getBoolean("sex");
+                s.phone = rs.getString("phone");
+                s.password = rs.getString("password");
+                s.createAt = rs.getTimestamp("create_at");
+                return s;
+            }
+        }
+    }
+
+    public void changePasswordWithVerify(int studentId, boolean byEmail,
+                                         String verifyValue, String oldPass, String newPass) throws SQLException {
+        String field = byEmail ? "email" : "phone";
+        String sqlCheck = "SELECT 1 FROM student WHERE id=? AND " + field + "=? AND password=?";
+        String sqlUpd = "UPDATE student SET password=? WHERE id=?";
+        try (Connection c = Db.getConn()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement check = c.prepareStatement(sqlCheck);
+                 PreparedStatement upd = c.prepareStatement(sqlUpd)) {
+                check.setInt(1, studentId);
+                check.setString(2, verifyValue);
+                check.setString(3, oldPass);
+
+                boolean ok;
+                try (ResultSet rs = check.executeQuery()) { ok = rs.next(); }
+                if (!ok) {
+                    c.rollback();
+                    throw new SQLException("Xác thực thất bại (email/sđt hoặc mật khẩu cũ sai).");
+                }
+
+                upd.setString(1, newPass);
+                upd.setInt(2, studentId);
+                upd.executeUpdate();
+                c.commit();
+            } catch (SQLException e) {
+                c.rollback();
+                throw e;
+            } finally {
+                c.setAutoCommit(true);
+            }
         }
     }
 }

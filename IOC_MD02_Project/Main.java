@@ -8,21 +8,25 @@ public class Main {
     static final AdminDao adminDao = new AdminDao();
     static final CourseDao courseDao = new CourseDao();
     static final StudentDao studentDao = new StudentDao();
+    static final EnrollmentDao enrollmentDao = new EnrollmentDao();
 
     public static void main(String[] args) {
         while (true) {
             Input.clear();
             System.out.println("======== THỐNG QUẢN LÝ ĐÀO TẠO ========");
             System.out.println("1. Đăng nhập với tư cách Quản trị viên");
-            System.out.println("2. Thoát");
+            System.out.println("2. Đăng nhập với tư cách Học viên");
+            System.out.println("3. Thoát");
             System.out.println("=======================================");
-            int ch = Input.readInt("Nhập lựa chọn: ", 1, 2);
+            int ch = Input.readInt("Nhập lựa chọn: ", 1, 3);
+
             if (ch == 1) adminLogin();
+            else if (ch == 2) studentLogin();
             else return;
         }
     }
 
-
+    // ========================== ADMIN ==========================
     static void adminLogin() {
         while (true) {
             Input.clear();
@@ -59,12 +63,14 @@ public class Main {
             System.out.println("3. Đăng xuất");
             System.out.println("================================");
             int ch = Input.readInt("Chọn: ", 1, 3);
+
             if (ch == 1) adminCourses();
             else if (ch == 2) adminStudents();
             else return;
         }
     }
 
+    // ----- Admin: Course -----
     static void adminCourses() {
         while (true) {
             Input.clear();
@@ -103,7 +109,8 @@ public class Main {
                         System.out.println("Chọn thuộc tính: 1.name  2.duration  3.instructor");
                         int f = Input.readInt("Chọn: ", 1, 3);
                         if (f == 1) courseDao.updateField(id, "name", Input.nonBlank("Name mới: "));
-                        else if (f == 2) courseDao.updateField(id, "duration", Input.readInt("Duration mới: ", 1, Integer.MAX_VALUE));
+                        else if (f == 2)
+                            courseDao.updateField(id, "duration", Input.readInt("Duration mới: ", 1, Integer.MAX_VALUE));
                         else courseDao.updateField(id, "instructor", Input.nonBlank("Instructor mới: "));
                         System.out.println("✅ Cập nhật thành công!");
                         Input.pause();
@@ -114,9 +121,7 @@ public class Main {
                         if (ok) {
                             courseDao.delete(id);
                             System.out.println("✅ Đã xóa!");
-                        } else {
-                            System.out.println("Đã hủy.");
-                        }
+                        } else System.out.println("Đã hủy.");
                         Input.pause();
                     }
                     case 5 -> {
@@ -125,8 +130,8 @@ public class Main {
                         Input.pause();
                     }
                     case 6 -> {
-                        String by = Input.choice("Sắp xếp theo (id/name): ", new String[]{"id","name"});
-                        String dir = Input.choice("Chiều (ASC/DESC): ", new String[]{"ASC","DESC"});
+                        String by = Input.choice("Sắp xếp theo (id/name): ", new String[]{"id", "name"});
+                        String dir = Input.choice("Chiều (ASC/DESC): ", new String[]{"ASC", "DESC"});
                         TablePrinter.courses(courseDao.list(null, by, dir));
                         Input.pause();
                     }
@@ -138,6 +143,8 @@ public class Main {
             }
         }
     }
+
+    // ----- Admin: Student -----
     static void adminStudents() {
         while (true) {
             Input.clear();
@@ -160,8 +167,7 @@ public class Main {
                     }
                     case 2 -> {
                         String name = Input.nonBlank("Họ tên: ");
-                        String dobStr = Input.nonBlank("DOB (yyyy-mm-dd): ");
-                        Date dob = Date.valueOf(dobStr); // sai format sẽ throw -> catch bên dưới
+                        Date dob = Date.valueOf(Input.nonBlank("DOB (yyyy-mm-dd): "));
                         String email = Input.nonBlank("Email: ");
                         int sex = Input.readInt("Giới tính (Nam=1, Nữ=0): ", 0, 1);
                         String phone = Input.optional("SĐT (có thể bỏ trống): ");
@@ -184,9 +190,11 @@ public class Main {
 
                         switch (f) {
                             case 1 -> studentDao.updateField(id, "name", Input.nonBlank("Name mới: "));
-                            case 2 -> studentDao.updateField(id, "dob", Date.valueOf(Input.nonBlank("DOB mới (yyyy-mm-dd): ")));
+                            case 2 -> studentDao.updateField(id, "dob",
+                                    Date.valueOf(Input.nonBlank("DOB mới (yyyy-mm-dd): ")));
                             case 3 -> studentDao.updateField(id, "email", Input.nonBlank("Email mới: "));
-                            case 4 -> studentDao.updateField(id, "sex", Input.readInt("Sex (Nam=1, Nữ=0): ", 0, 1) == 1);
+                            case 4 -> studentDao.updateField(id, "sex",
+                                    Input.readInt("Sex (Nam=1, Nữ=0): ", 0, 1) == 1);
                             case 5 -> studentDao.updateField(id, "phone", Input.optional("Phone mới (có thể bỏ trống): "));
                         }
 
@@ -199,9 +207,7 @@ public class Main {
                         if (ok) {
                             studentDao.delete(id);
                             System.out.println("✅ Đã xóa!");
-                        } else {
-                            System.out.println("Đã hủy.");
-                        }
+                        } else System.out.println("Đã hủy.");
                         Input.pause();
                     }
                     case 5 -> {
@@ -222,6 +228,97 @@ public class Main {
                 Input.pause();
             } catch (SQLException e) {
                 System.out.println("❌ Lỗi DB: " + e.getMessage());
+                Input.pause();
+            }
+        }
+    }
+
+    // ========================== STUDENT (BUỔI 4) ==========================
+    static void studentLogin() {
+        while (true) {
+            Input.clear();
+            System.out.println("===== ĐĂNG NHẬP HỌC VIÊN =====");
+            System.out.println("(Nhập email hoặc số điện thoại)");
+            String key = Input.nonBlank("Email/SĐT: ");
+            String pass = Input.nonBlank("Password: ");
+
+            try {
+                Student s = studentDao.login(key, pass);
+                if (s == null) {
+                    System.out.println("❌ Sai thông tin đăng nhập! Nhập lại...");
+                    Input.pause();
+                    continue;
+                }
+                System.out.println("✅ Đăng nhập thành công!");
+                Input.pause();
+                studentMenu(s);
+                return;
+            } catch (SQLException e) {
+                System.out.println("❌ Lỗi DB: " + e.getMessage());
+                Input.pause();
+                return;
+            }
+        }
+    }
+
+    static void studentMenu(Student s) {
+        while (true) {
+            Input.clear();
+            System.out.println("========== MENU HỌC VIÊN ==========");
+            System.out.println("Xin chào, " + s.name + " (" + s.email + ")");
+            System.out.println("1. Xem danh sách khóa học");
+            System.out.println("2. Tìm kiếm khóa học theo tên/id");
+            System.out.println("3. Đăng ký khóa học");
+            System.out.println("4. Xem khóa học đã đăng ký + sắp xếp");
+            System.out.println("5. Hủy đăng ký (chỉ khi WAITING)");
+            System.out.println("6. Đổi mật khẩu (xác thực email/sđt + mk cũ)");
+            System.out.println("7. Đăng xuất");
+            System.out.println("===================================");
+            int ch = Input.readInt("Chọn: ", 1, 7);
+
+            try {
+                switch (ch) {
+                    case 1 -> {
+                        TablePrinter.courses(courseDao.list(null, "id", "ASC"));
+                        Input.pause();
+                    }
+                    case 2 -> {
+                        String kw = Input.nonBlank("Nhập từ khóa: ");
+                        TablePrinter.courses(courseDao.list(kw, "id", "ASC"));
+                        Input.pause();
+                    }
+                    case 3 -> {
+                        int courseId = Input.readInt("Nhập course_id muốn đăng ký: ", 1, Integer.MAX_VALUE);
+                        enrollmentDao.register(s.id, courseId);
+                        System.out.println("✅ Đăng ký thành công (WAITING)!");
+                        Input.pause();
+                    }
+                    case 4 -> {
+                        String by = Input.choice("Sắp xếp theo (NAME/DATE): ", new String[]{"NAME", "DATE"});
+                        String dir = Input.choice("Chiều (ASC/DESC): ", new String[]{"ASC", "DESC"});
+                        TablePrinter.studentRegistered(enrollmentDao.listRegisteredCourses(s.id, by, dir));
+                        Input.pause();
+                    }
+                    case 5 -> {
+                        int courseId = Input.readInt("Nhập course_id muốn hủy: ", 1, Integer.MAX_VALUE);
+                        enrollmentDao.cancelIfWaiting(s.id, courseId);
+                        System.out.println("✅ Đã hủy (CANCEL)!");
+                        Input.pause();
+                    }
+                    case 6 -> {
+                        System.out.println("Xác thực đổi mật khẩu: 1.Email  2.SĐT");
+                        boolean byEmail = Input.readInt("Chọn: ", 1, 2) == 1;
+                        String verify = Input.nonBlank(byEmail ? "Nhập Email: " : "Nhập SĐT: ");
+                        String oldPass = Input.nonBlank("Mật khẩu cũ: ");
+                        String newPass = Input.nonBlank("Mật khẩu mới: ");
+                        studentDao.changePasswordWithVerify(s.id, byEmail, verify, oldPass, newPass);
+                        System.out.println("✅ Đổi mật khẩu thành công!");
+                        Input.pause();
+                    }
+                    case 7 -> { return; }
+                }
+            } catch (SQLException e) {
+                System.out.println("❌ Lỗi: " + e.getMessage());
                 Input.pause();
             }
         }
