@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS enrollment (
                                           CONSTRAINT fk_enroll_course FOREIGN KEY (course_id)
                                               REFERENCES course(id) ON DELETE CASCADE
 );
--- (Gợi ý) tránh 1 học viên đăng ký trùng 1 khóa nhiều lần
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_enrollment_student_course
     ON enrollment(student_id, course_id);
 INSERT INTO projectioc.admin(username, password) VALUES ('admin','123456');

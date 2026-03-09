@@ -11,26 +11,27 @@ public class EnrollmentDao {
     }
 
     public void register(int studentId, int courseId) throws SQLException {
-        // Nếu bạn đã tạo UNIQUE INDEX (student_id, course_id) thì đã chặn trùng.
-        // Nhưng vẫn check để báo lỗi thân thiện:
-        String sqlCheck = "SELECT 1 FROM enrollment WHERE student_id=? AND course_id=? AND status <> 'CANCEL'";
-        String sqlIns = "INSERT INTO enrollment(student_id, course_id) VALUES (?, ?)";
+        String sql =
+                "INSERT INTO enrollment(student_id, course_id, status) " +
+                        "VALUES (?, ?, 'WAITING') " +
+                        "ON CONFLICT (student_id, course_id) DO UPDATE " +
+                        "SET status='WAITING', registered_at=CURRENT_TIMESTAMP " +
+                        "WHERE enrollment.status IN ('CANCEL','DENIED') " +
+                        "RETURNING status;";
 
-        try (Connection c = Db.getConn()) {
-            try (PreparedStatement check = c.prepareStatement(sqlCheck)) {
-                check.setInt(1, studentId);
-                check.setInt(2, courseId);
-                try (ResultSet rs = check.executeQuery()) {
-                    if (rs.next()) throw new SQLException("Bạn đã đăng ký khóa học này rồi!");
+        try (Connection c = Db.getConn();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            ps.setInt(2, courseId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return;
                 }
             }
-
-            try (PreparedStatement ins = c.prepareStatement(sqlIns)) {
-                ins.setInt(1, studentId);
-                ins.setInt(2, courseId);
-                ins.executeUpdate();
-            }
         }
+        throw new SQLException("Bạn đã đăng ký khóa học này rồi (đang WAITING/CONFIRMED).");
     }
 
     public List<StudentCourseRow> listRegisteredCourses(int studentId, String sortBy, String sortDir) throws SQLException {

@@ -70,7 +70,6 @@ public class Main {
         }
     }
 
-    // ----- Admin: Course -----
     static void adminCourses() {
         while (true) {
             Input.clear();
