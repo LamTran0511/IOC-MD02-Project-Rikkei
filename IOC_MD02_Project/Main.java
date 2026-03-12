@@ -5,10 +5,10 @@ import java.sql.SQLException;
 
 public class Main {
 
-    static final AdminDao adminDao = new AdminDao();
-    static final CourseDao courseDao = new CourseDao();
-    static final StudentDao studentDao = new StudentDao();
-    static final EnrollmentDao enrollmentDao = new EnrollmentDao();
+    static final Admindao adminDao = new Admindao();
+    static final Coursedao courseDao = new Coursedao();
+    static final Studentdao studentDao = new Studentdao();
+    static final Enrollmentdao enrollmentDao = new Enrollmentdao();
 
     public static void main(String[] args) {
         while (true) {
