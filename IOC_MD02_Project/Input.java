@@ -51,7 +51,7 @@ public class Input {
             String s = sc.nextLine().trim();
             if (s.equalsIgnoreCase("y") || s.equalsIgnoreCase("yes")) return true;
             if (s.equalsIgnoreCase("n") || s.equalsIgnoreCase("no")) return false;
-            System.out.println("❌ Nhập y/n");
+            System.out.println("Nhập y/n");
         }
     }
 
@@ -62,7 +62,7 @@ public class Input {
             for (String a : allowed) {
                 if (a.equalsIgnoreCase(s)) return a.toUpperCase();
             }
-            System.out.print("❌ Chỉ nhận: ");
+            System.out.print("Chỉ nhận: ");
             for (int i = 0; i < allowed.length; i++) {
                 System.out.print(allowed[i]);
                 if (i < allowed.length - 1) System.out.print(", ");

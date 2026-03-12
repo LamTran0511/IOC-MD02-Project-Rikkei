@@ -26,7 +26,6 @@ public class Main {
         }
     }
 
-    // ========================== ADMIN ==========================
     static void adminLogin() {
         while (true) {
             Input.clear();
@@ -37,16 +36,16 @@ public class Main {
             try {
                 Admin a = adminDao.login(user, pass);
                 if (a == null) {
-                    System.out.println("❌ Sai username/password! Nhập lại...");
+                    System.out.println("Sai username/password! Nhập lại...");
                     Input.pause();
                     continue;
                 }
-                System.out.println("✅ Đăng nhập thành công!");
+                System.out.println("Đăng nhập thành công!");
                 Input.pause();
                 adminMenu(a);
                 return;
             } catch (SQLException e) {
-                System.out.println("❌ Lỗi DB: " + e.getMessage());
+                System.out.println("Lỗi DB: " + e.getMessage());
                 Input.pause();
                 return;
             }
@@ -95,13 +94,13 @@ public class Main {
                         int duration = Input.readInt("Thời lượng (giờ): ", 1, Integer.MAX_VALUE);
                         String instructor = Input.nonBlank("Giảng viên: ");
                         courseDao.add(name, duration, instructor);
-                        System.out.println("✅ Thêm khóa học thành công!");
+                        System.out.println("Thêm khóa học thành công!");
                         Input.pause();
                     }
                     case 3 -> {
                         int id = Input.readInt("Nhập id khóa học cần sửa: ", 1, Integer.MAX_VALUE);
                         if (!courseDao.exists(id)) {
-                            System.out.println("❌ Không tìm thấy khóa học!");
+                            System.out.println("Không tìm thấy khóa học!");
                             Input.pause();
                             break;
                         }
@@ -111,7 +110,7 @@ public class Main {
                         else if (f == 2)
                             courseDao.updateField(id, "duration", Input.readInt("Duration mới: ", 1, Integer.MAX_VALUE));
                         else courseDao.updateField(id, "instructor", Input.nonBlank("Instructor mới: "));
-                        System.out.println("✅ Cập nhật thành công!");
+                        System.out.println("Cập nhật thành công!");
                         Input.pause();
                     }
                     case 4 -> {
@@ -119,7 +118,7 @@ public class Main {
                         boolean ok = Input.yesNo("Xác nhận xóa? (y/n): ");
                         if (ok) {
                             courseDao.delete(id);
-                            System.out.println("✅ Đã xóa!");
+                            System.out.println("Đã xóa!");
                         } else System.out.println("Đã hủy.");
                         Input.pause();
                     }
@@ -137,7 +136,7 @@ public class Main {
                     case 7 -> { return; }
                 }
             } catch (SQLException e) {
-                System.out.println("❌ Lỗi: " + e.getMessage());
+                System.out.println("Lỗi: " + e.getMessage());
                 Input.pause();
             }
         }
@@ -173,13 +172,13 @@ public class Main {
                         String pass = Input.nonBlank("Password: ");
 
                         studentDao.add(name, dob, email, sex == 1, phone, pass);
-                        System.out.println("✅ Thêm học viên thành công!");
+                        System.out.println("Thêm học viên thành công!");
                         Input.pause();
                     }
                     case 3 -> {
                         int id = Input.readInt("Nhập id học viên cần sửa: ", 1, Integer.MAX_VALUE);
                         if (!studentDao.exists(id)) {
-                            System.out.println("❌ Không tìm thấy học viên!");
+                            System.out.println("Không tìm thấy học viên!");
                             Input.pause();
                             break;
                         }
@@ -197,7 +196,7 @@ public class Main {
                             case 5 -> studentDao.updateField(id, "phone", Input.optional("Phone mới (có thể bỏ trống): "));
                         }
 
-                        System.out.println("✅ Cập nhật thành công!");
+                        System.out.println("Cập nhật thành công!");
                         Input.pause();
                     }
                     case 4 -> {
@@ -205,7 +204,7 @@ public class Main {
                         boolean ok = Input.yesNo("Xác nhận xóa? (y/n): ");
                         if (ok) {
                             studentDao.delete(id);
-                            System.out.println("✅ Đã xóa!");
+                            System.out.println("Đã xóa!");
                         } else System.out.println("Đã hủy.");
                         Input.pause();
                     }
@@ -223,16 +222,15 @@ public class Main {
                     case 7 -> { return; }
                 }
             } catch (IllegalArgumentException e) {
-                System.out.println("❌ DOB sai định dạng! Nhập đúng yyyy-mm-dd.");
+                System.out.println("DOB sai định dạng! Nhập đúng yyyy-mm-dd.");
                 Input.pause();
             } catch (SQLException e) {
-                System.out.println("❌ Lỗi DB: " + e.getMessage());
+                System.out.println("Lỗi DB: " + e.getMessage());
                 Input.pause();
             }
         }
     }
 
-    // ========================== STUDENT (BUỔI 4) ==========================
     static void studentLogin() {
         while (true) {
             Input.clear();
@@ -244,16 +242,16 @@ public class Main {
             try {
                 Student s = studentDao.login(key, pass);
                 if (s == null) {
-                    System.out.println("❌ Sai thông tin đăng nhập! Nhập lại...");
+                    System.out.println("Sai thông tin đăng nhập! Nhập lại...");
                     Input.pause();
                     continue;
                 }
-                System.out.println("✅ Đăng nhập thành công!");
+                System.out.println("Đăng nhập thành công!");
                 Input.pause();
                 studentMenu(s);
                 return;
             } catch (SQLException e) {
-                System.out.println("❌ Lỗi DB: " + e.getMessage());
+                System.out.println("Lỗi DB: " + e.getMessage());
                 Input.pause();
                 return;
             }
@@ -289,7 +287,7 @@ public class Main {
                     case 3 -> {
                         int courseId = Input.readInt("Nhập course_id muốn đăng ký: ", 1, Integer.MAX_VALUE);
                         enrollmentDao.register(s.id, courseId);
-                        System.out.println("✅ Đăng ký thành công (WAITING)!");
+                        System.out.println("Đăng ký thành công (WAITING)!");
                         Input.pause();
                     }
                     case 4 -> {
@@ -301,7 +299,7 @@ public class Main {
                     case 5 -> {
                         int courseId = Input.readInt("Nhập course_id muốn hủy: ", 1, Integer.MAX_VALUE);
                         enrollmentDao.cancelIfWaiting(s.id, courseId);
-                        System.out.println("✅ Đã hủy (CANCEL)!");
+                        System.out.println("Đã hủy (CANCEL)!");
                         Input.pause();
                     }
                     case 6 -> {
@@ -311,13 +309,13 @@ public class Main {
                         String oldPass = Input.nonBlank("Mật khẩu cũ: ");
                         String newPass = Input.nonBlank("Mật khẩu mới: ");
                         studentDao.changePasswordWithVerify(s.id, byEmail, verify, oldPass, newPass);
-                        System.out.println("✅ Đổi mật khẩu thành công!");
+                        System.out.println("Đổi mật khẩu thành công!");
                         Input.pause();
                     }
                     case 7 -> { return; }
                 }
             } catch (SQLException e) {
-                System.out.println("❌ Lỗi: " + e.getMessage());
+                System.out.println("Lỗi: " + e.getMessage());
                 Input.pause();
             }
         }
