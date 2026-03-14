@@ -19,7 +19,7 @@ public class Input {
             System.out.print(prompt);
             String s = sc.nextLine();
             if (s != null && !s.trim().isEmpty()) return s.trim();
-            System.out.println("❌ Không được để trống!");
+            System.out.println("Không được để trống!");
         }
     }
 
@@ -40,7 +40,7 @@ public class Input {
                 if (v < min || v > max) throw new NumberFormatException();
                 return v;
             } catch (Exception e) {
-                System.out.println("❌ Nhập số trong khoảng [" + min + ", " + max + "]");
+                System.out.println("Nhập số trong khoảng [" + min + ", " + max + "]");
             }
         }
     }
