@@ -7,8 +7,8 @@ import IOC_MD02_Project.service.IStudentService;
 import IOC_MD02_Project.service.impl.AdminServiceImpl;
 import IOC_MD02_Project.service.impl.CourseServiceImpl;
 import IOC_MD02_Project.service.impl.StudentServiceImpl;
-import IOC_MD02_Project.view.Input;
-import IOC_MD02_Project.view.TablePrinter;
+import IOC_MD02_Project.InputVallidate.Input;
+import IOC_MD02_Project.utils.TablePrinter;
 
 import java.sql.Date;
 import java.sql.SQLException;
